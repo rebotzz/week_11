@@ -4,6 +4,6 @@
 
 int main()
 {
-	kozen::test_priority_queue2();
+	kozen::test_priority_queue3();
 	return 0;
 }

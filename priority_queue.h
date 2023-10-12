@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <deque>
 #include "Date.h"
 using namespace std;
 
@@ -59,6 +60,7 @@ namespace kozen
 
 		}
 
+		//向上和向下调整算法时间复杂度O(logN)
 		void adjust_up(int root = 0)
 		{
 			int child = size() - 1;
@@ -79,7 +81,8 @@ namespace kozen
 			}
 		}
 
-		void push(const T& val)
+		//建堆的时间复杂度可以认为是O(N)
+		void push(const T& val)	
 		{
 			_con.push_back(val);
 			adjust_up();
@@ -172,6 +175,26 @@ namespace kozen
 		while (!pq.empty())
 		{
 			//cout << *(pq.top()) << " ";
+			cout << pq.top() << " ";
+			pq.pop();
+		}
+		cout << endl;
+	}
+
+
+	void test_priority_queue3()
+	{
+		//支持operator[]的底层容器都行
+		priority_queue<int, deque<int>, Greater<int>> pq;
+		pq.push(2);
+		pq.push(3);
+		pq.push(5);
+		pq.push(4);
+		pq.push(0);
+
+
+		while (!pq.empty())
+		{
 			cout << pq.top() << " ";
 			pq.pop();
 		}
