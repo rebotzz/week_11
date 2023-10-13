@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include "Lagrange_1.h"
+#include "my_algrithm_numerical_calculation.h"
 using namespace std;
 
 void test()
@@ -19,6 +20,11 @@ int main()
 	cout << endl;
 	cout << "Newton:" << endl;
 	test_newton();
+	cout << endl;
+
+	cout << "***********************" << endl;
+	cout << endl;
+	NumericalCalculation::test_L_N();
 
 	//test();
 

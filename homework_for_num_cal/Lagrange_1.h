@@ -70,104 +70,104 @@ void question1_1()
 }
 
 
-////牛顿插值	1.0	时间复杂度O（N^2）,空间复杂度O（N^2）
-//template<class T>
-//T newton(T x, const vector<T>& xi, const vector<T>& yi)
-//{
-//	//差商
-//	size_t n = yi.size() - 1;
-//	vector<T> tmp(n + 1, 0);
-//	vector<vector<T>> fi(n + 1, tmp);	
-//	//0阶差商，即yi
-//	fi[0] = yi;
-//
-//	//cout << "初始化差商表：" << endl;
-//	//for (size_t i = 0; i < fi.size(); ++i)
-//	//{
-//	//	for (size_t j = 0; j < fi.size(); ++j)
-//	//	{
-//	//		//cout << fi[i][j] << " ";
-//	//		cout << fi[j][i] << " ";
-//	//	}
-//	//	cout << endl;
-//	//}
-//	//cout << endl;
-//
-//	//外层，差商阶数
-//	for (size_t i = 1; i <= n; ++i)
-//	{
-//		//内层，不同差商
-//		for (size_t j = i; j <= n; ++j)
-//		{
-//			fi[i][j] = (fi[i - 1][j] - fi[i - 1][j - 1]) / (xi[j] - xi[j - i]);	//debug:这里是j - i
-//		}
-//	}
-//
-//	//cout << "计算后差商表：" << endl;
-//	//for (size_t i = 0; i < fi.size(); ++i)
-//	//{
-//	//	for (size_t j = 0; j < fi.size(); ++j)
-//	//	{
-//	//		cout << fi[j][i] << " ";
-//	//	}
-//	//	cout << endl;
-//	//}
-//	//cout << endl;
-//
-//	//求插值点在插值多项式的值
-//	double p = yi[0];
-//	for (size_t i = 1; i <= n; ++i)
-//	{
-//		//fi[i][n - i + 1]*(x - xi[n - i]) + fi[i]
-//
-//		//基函数
-//		double fn = 1.0;
-//		size_t j = i;
-//		while (j > 0)	//debug
-//		{
-//			fn *= x - xi[j - 1];
-//			j--;
-//		}
-//		p += fi[i][i] * fn;
-//	}
-//
-//	return p;
-//}
+//牛顿插值	1.0	时间复杂度O（N^2）,空间复杂度O（N^2）
+template<class T>
+T newton(T x, const vector<T>& xi, const vector<T>& yi)
+{
+	//差商
+	size_t n = yi.size() - 1;
+	vector<T> tmp(n + 1, 0);
+	vector<vector<T>> fi(n + 1, tmp);	
+	//0阶差商，即yi
+	fi[0] = yi;
+
+	//cout << "初始化差商表：" << endl;
+	//for (size_t i = 0; i < fi.size(); ++i)
+	//{
+	//	for (size_t j = 0; j < fi.size(); ++j)
+	//	{
+	//		//cout << fi[i][j] << " ";
+	//		cout << fi[j][i] << " ";
+	//	}
+	//	cout << endl;
+	//}
+	//cout << endl;
+
+	//外层，差商阶数
+	for (size_t i = 1; i <= n; ++i)
+	{
+		//内层，不同差商
+		for (size_t j = i; j <= n; ++j)
+		{
+			fi[i][j] = (fi[i - 1][j] - fi[i - 1][j - 1]) / (xi[j] - xi[j - i]);	//debug:这里是j - i,即f[0,..,n] = (...)/(x[n] - x[0])
+		}
+	}
+
+	//cout << "计算后差商表：" << endl;
+	//for (size_t i = 0; i < fi.size(); ++i)
+	//{
+	//	for (size_t j = 0; j < fi.size(); ++j)
+	//	{
+	//		cout << fi[j][i] << " ";
+	//	}
+	//	cout << endl;
+	//}
+	//cout << endl;
+
+	//求插值点在插值多项式的值
+	double p = yi[0];
+	for (size_t i = 1; i <= n; ++i)
+	{
+		//fi[i][n - i + 1]*(x - xi[n - i]) + fi[i]
+
+		//基函数
+		double fn = 1.0;
+		size_t j = i;
+		while (j > 0)	//debug
+		{
+			fn *= x - xi[j - 1];
+			j--;
+		}
+		p += fi[i][i] * fn;
+	}
+
+	return p;
+}
 
 
 
-////牛顿插值	2.0	时间复杂度O（N^2）,空间复杂度O（N^2）
-//template<class T>
-//T newton(T x, const vector<T>& xi, const vector<T>& yi)
-//{
-//	//差商
-//	size_t n = yi.size() - 1;
-//	vector<T> tmp(n + 1, 0);
-//	vector<vector<T>> fi(n + 1, tmp);
-//	//0阶差商，即yi
-//	fi[0] = yi;
-//
-//	//外层，差商阶数
-//	for (size_t i = 1; i <= n; ++i)
-//	{
-//		//内层，不同差商
-//		for (size_t j = i; j <= n; ++j)
-//		{
-//			fi[i][j] = (fi[i - 1][j] - fi[i - 1][j - 1]) / (xi[j] - xi[j - i]);	//debug:这里是j - i
-//		}
-//	}
-//
-//	//求插值点在插值多项式的值
-//	//插值多项式
-//	double p = fi[n][n];
-//	for (size_t i = n; i > 0; --i)
-//	{
-//		p *= (x - xi[i - 1]);
-//		p += fi[i - 1][i - 1];
-//	}
-//
-//	return p;
-//}
+//牛顿插值	2.0	时间复杂度O（N^2）,空间复杂度O（N^2）
+template<class T>
+T newton(T x, const vector<T>& xi, const vector<T>& yi)
+{
+	//差商
+	size_t n = yi.size() - 1;
+	vector<T> tmp(n + 1, 0);
+	vector<vector<T>> fi(n + 1, tmp);
+	//0阶差商，即yi
+	fi[0] = yi;
+
+	//外层，差商阶数
+	for (size_t i = 1; i <= n; ++i)
+	{
+		//内层，不同差商
+		for (size_t j = i; j <= n; ++j)
+		{
+			fi[i][j] = (fi[i - 1][j] - fi[i - 1][j - 1]) / (xi[j] - xi[j - i]);	//debug:这里是j - i
+		}
+	}
+
+	//求插值点在插值多项式的值
+	//插值多项式
+	double p = fi[n][n];
+	for (size_t i = n; i > 0; --i)
+	{
+		p *= (x - xi[i - 1]);
+		p += fi[i - 1][i - 1];
+	}
+
+	return p;
+}
 
 //牛顿插值	3.0	时间复杂度O（N^2）,空间复杂度O（N）
 template<class T>
@@ -214,12 +214,12 @@ void test_newton()
 	vector<double> y1(4, 1);
 	vector<double> y2(4, 1);
 
-	//求解
-	for (size_t i = 0; i < x.size(); ++i)
-	{
-		y1[i] = newton(x[i], xi, yi1);
-		y2[i] = newton(x[i], xi, yi2);
-	}
+	////求解
+	//for (size_t i = 0; i < x.size(); ++i)
+	//{
+	//	y1[i] = newton(x[i], xi, yi1);
+	//	y2[i] = newton(x[i], xi, yi2);
+	//}
 
 	//打印结果
 	cout << "输入年份:" << endl;
