@@ -1,10 +1,16 @@
 #pragma once
 #include <iostream>	
 #include <vector>	
+#include "Eigen/Dense"
+#include <math.h>
+#include <assert.h>
+#include <iomanip>  //流控制头文件
 using namespace std;
+using Eigen::MatrixXd;
 
 namespace NumericalCalculation
 {
+	//插值算法
 	//容器必须支持operator[],随机访问迭代器
 	template<class T = double, class Container = vector<T>>
 	class Interpolate
@@ -42,7 +48,7 @@ namespace NumericalCalculation
 				{
 					if (j != i)
 					{
-						ln *= (x - (double)xi[j]) / ((double)xi[i] - (double)xi[j]);
+						ln *= (x - xi[j]) / (xi[i] - xi[j]);
 					}
 				}
 				y += yi[i] * ln;
@@ -104,69 +110,243 @@ namespace NumericalCalculation
 			}
 			return _y;
 		}
-
-
 	};
 
+
+	//最小二乘拟合算法
+	template<class T = double>
+	class LeastSquare
+	{
+	public:
+		//拟合点(xi,yi),拟合阶数n
+		LeastSquare(const vector<T>& xi, const vector<T>& yi, const size_t n = 1)
+			:_xi(xi)
+			, _yi(yi)
+			, _n(n)
+		{}
+
+		//离散点内积，默认基底为x^power，x的power次幂
+		T MyInnerProduct(const vector<T>& xi, const vector<T>& yi, const size_t powerX, const size_t powerY)
+		{
+			assert(xi.size() == yi.size());
+			T sum = 0.0;
+			size_t n = xi.size();
+			for (size_t i = 0; i < n; ++i)
+			{
+				sum += pow(xi[i], powerX) * pow(yi[i], powerY);
+			}
+			return sum;
+		}
+
+		void result()
+		{
+			//初始化拟合点数组
+			vector<double>& xi = _xi;
+			vector<double>& yi = _yi;
+
+			cout << "xi:" << endl;
+			for (auto e : xi)
+			{
+				cout << e << " ";
+			}
+			cout << endl;
+			cout << "yi:" << endl;
+			for (auto e : yi)
+			{
+				cout << e << " ";
+			}
+			cout << endl;
+
+
+			// 基函数 g1 = 1, g2 = x, g3 = x^2,... ==> 求解n+1个系数，(n+1)*(n+1)矩阵
+			// 求解方程组:Ax = B
+			size_t N = _n + 1;		// N = n + 1, n阶拟合
+			MatrixXd A(N, N);
+			for (size_t i = 0; i < N; ++i)
+			{
+				for (size_t j = 0; j < N; ++j)
+				{
+					A(i, j) = MyInnerProduct(xi, xi, i, j);	//基底的选择使得（gi,gj）= x^(i+j)
+				}
+			}
+
+			cout << "A:" << endl;
+			cout << A << endl;
+
+			//待求解，X
+			MatrixXd X(N, 1);
+			//等式右端矩阵
+			MatrixXd B(N, 1);
+			for (size_t i = 0; i < N; ++i)
+			{
+				B(i, 0) = MyInnerProduct(xi, yi, i, 1);
+			}
+
+			cout << "B:" << endl;
+			cout << B << endl;
+
+			//求解系数矩阵， X = (A^-1)*B;
+			X = A.inverse() * B;	//debug:求逆是inverse(),不是reverse();
+			cout << "AX = B ==> X：" << endl;
+			cout << X << endl;
+		}
+
+	private:
+		vector<T> _xi;
+		vector<T> _yi;
+		size_t _n;
+	};
+
+
+	//Romberg积分算法	
+	//Function积分函数(函数对象)，Type数据类型
+	template<class Function, class Type = double>
+	class RombergIntegration	
+	{
+	public:
+		//积分区间a,b,积分精度accuracy,表格最大容量MaxSize
+		RombergIntegration(Type a, Type b, Type accuracy, size_t MaxSize = 30)
+			:_a(a)
+			, _b(b)
+			, _accy(accuracy)
+			, _maxSize(MaxSize)
+		{
+			//开辟二维数组，申请内存空间	MaxSize * MaxSize
+			_table = new Type * [MaxSize];
+			for (int i = 0; i < MaxSize; ++i)
+			{
+				_table[i] = new Type[MaxSize];
+			}
+		}
+
+		~RombergIntegration()
+		{
+			//释放内存空间
+			for (int i = 0; i < _maxSize; ++i)
+			{
+				delete[] _table[i];
+			}
+			delete[] _table;
+		}
+
+		Type integral()
+		{
+			//1.计算T0(h)
+			Type h = _b - _a;		//初始步长,二分次数0
+			Type T0 = h * (_func(_a) + _func(_b)) / 2;
+			_table[0][0] = T0;
+			//2.计算Tk((b-a)/2^k) 递推公式:Tk = 0.5*T(k-1)+新步长*新节点函数值
+			for (int i = 1; i <= K; i++)
+			{
+				_table[i][0] = getIntegralValue(_table[i - 1][0], pow(2, i));
+			}
+
+
+			//3.求加速值Tk_m(h),即：Sk,Ck,Rk。。。
+			for (int mi = 1; mi <= K; mi++)			//列
+			{
+				for (int ki = mi; ki <= K; ki++)	//行
+				{
+					Type index = pow(4, mi);
+					_table[ki][mi] = _table[ki][mi - 1] * index / (index - 1) - _table[ki - 1][mi - 1] / (index - 1);
+				}
+			}
+
+			//4.精度检验
+			//Type gap = _table[K][K] - _table[K - 1][K - 1];
+			Type gap = _table[K][K] - _table[K][K - 1];
+			if (gap < 0)
+				gap *= -1;
+			if (gap <= _accy)
+			{
+				return _table[K][K];
+			}
+
+			//如果误差限不满足要求，则继续更新table表
+			else
+			{
+				//i代表行，j代表列
+				int i = K + 1;
+				while (gap > _accy)
+				{
+					_table[i][0] = getIntegralValue(_table[i - 1][0], pow(2, i));
+					for (int j = 1; j <= i; j++)
+					{
+						Type index = pow(4, j);
+						_table[i][j] = _table[i][j - 1] * index / (index - 1) - _table[i - 1][j - 1] / (index - 1);
+					}
+
+					//Type gap = _table[i][i] - _table[i - 1][i - 1];
+					Type gap = _table[i][i] - _table[i][i - 1];		//两种误差估计方法都可以
+					if (gap < 0)
+						gap *= -1;
+					if (gap <= _accy)
+					{
+						K = i;
+						return _table[i][i];
+					}
+				}
+			}
+		}
+
+		//复化梯形求积	2.0
+		Type getIntegralValue(Type preT, int newN)
+		{
+			Type sum = 0;
+			Type h = (_b - _a) / newN;			//二分后新的步长
+			int preN = newN / 2;
+			for (int i = 1; i <= preN; ++i)
+			{
+				sum += h * _func(_a + (2 * i - 1) * h);
+			}
+			Type value = 0.5 * preT + sum;
+			return value;
+		}
+
+		//输出table
+		void print()
+		{
+			cout << "------------------------------------------------------------------" << endl;
+			cout << "k " << "   T     " << "    S     " << "   C     " << "    R    " << endl;
+			for (int i = 0; i <= K; i++)
+			{
+				cout << i << " ";
+				for (int j = 0; j <= i; j++)
+				{
+					//if (j <= 3)
+					{
+						cout.setf(ios::showpoint);
+						cout << setprecision(8) << _table[i][j] << " ";
+					}
+				}
+				cout << endl;
+			}
+			cout << "------------------------------------------------------------------" << endl;
+			cout << "this is result: " << _table[K][K] << endl;
+		}
+
+	private:
+		Type _a;
+		Type _b;				//积分区间[_a,_b]
+		Type _accy;				//精度
+		Function _func;			//被积函数，使用仿函数定义
+		int K = 4;				//初始二分次数
+		size_t _maxSize;
+		//Type _table[30][30];	//1.0数据存储在栈上
+		Type** _table;			//2.0数据存储在堆上
+	};
+
+
 }
+
+
+#define DEBUG
+#ifdef DEBUG
 
 namespace NumericalCalculation
 {
-	void test_L_N()
-	{
-		//插值点
-		vector<double> xi = { 2005,2010,2015,2020 };
-		vector<double> yi1 = { 72.8,74.2,75.2,76.4 };
-		vector<double> yi2 = { 70.2,70.2,70.3,71.2 };
 
-		//待求点
-		vector<double> x = { 2000,2013,2018,2025 };
 
-		//Interpolate<double, vector<double>> ln1(x, xi, yi1);
-		//Interpolate<double, vector<double>> ln2(x, xi, yi2);
-		Interpolate<double> ln1(x, xi, yi1);
-		Interpolate<double> ln2(x, xi, yi2);
-
-		auto l1 = ln1.Lagrange();
-		auto l2 = ln2.Lagrange();
-		auto n1 = ln1.Newton();
-		auto n2 = ln2.Newton();
-
-		//打印结果
-		cout << "输入年份:" << endl;
-		for (auto e : x)
-		{
-			cout << e << " ";
-		}
-		cout << endl;
-
-		cout << "拉格朗日：" << endl;
-		cout << "输出结果,地区一:" << endl;
-		for (auto e : l1)
-		{
-			cout << e << " ";
-		}
-		cout << endl;
-		cout << "输出结果,地区二:" << endl;
-		for (auto e : l2)
-		{
-			cout << e << " ";
-		}
-		cout << endl;
-		cout << endl;
-
-		cout << "牛顿：" << endl;
-		cout << "输出结果,地区一:" << endl;
-		for (auto e : n1)
-		{
-			cout << e << " ";
-		}
-		cout << endl;
-		cout << "输出结果,地区二:" << endl;
-		for (auto e : n2)
-		{
-			cout << e << " ";
-		}
-		cout << endl;
-	}
 }
+
+#endif // DEBUG
