@@ -60,7 +60,7 @@ public:
 		}
 
 		//4.精度检验
-		//Type gap = _table[K][K] - _table[K - 1][K - 1];
+		//Type gap = _table[K][K] - _table[K - 1][K - 1];//gap <= 3*_accy
 		Type gap = _table[K][K] - _table[K][K - 1];
 		if (gap < 0)
 			gap *= -1;
@@ -83,8 +83,8 @@ public:
 					_table[i][j] = _table[i][j - 1] * index / (index - 1) - _table[i - 1][j - 1] / (index - 1);
 				}
 
-				//Type gap = _table[i][i] - _table[i - 1][i - 1];
-				Type gap = _table[i][i] - _table[i][i - 1];		//两种误差估计方法都可以
+				//Type gap = _table[i][i] - _table[i - 1][i - 1];//gap <= 3*_accy
+				Type gap = _table[i][i] - _table[i][i - 1];		 //两种误差估计方法都可以
 				if (gap < 0)
 					gap *= -1;
 				if (gap <= _accy)
