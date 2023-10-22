@@ -18,6 +18,12 @@
     <ClCompile Include="test.cc">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="AI_code.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="inherit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inher.h">

@@ -2,7 +2,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "inher.h"
 using namespace std;
 
 
@@ -66,35 +65,38 @@ using namespace std;
 //	return 0;
 //}
 
-int main()
-{
-	//string s1 = "hello world";
+//int main()
+//{
+//	//string s1 = "hello world";
+//
+//	//string s2 = "change world";
+//
+//	//string::iterator it = s1.begin();
+//
+//	//swap(s1, s2);
+//
+//	//while (it != s1.end())
+//
+//	//	cout << *it;
+//
+//	//cout << endl;
+//
+//	vector<int> v1;
+//	vector<int>::iterator it = v1.begin();
+//	auto end = v1.end();
+//	//cin >> it;
+//	cout << (it == end) << endl;
+//	/*it += 2;*/
+//	v1.push_back(1);
+//	v1.push_back(2);
+//	v1.push_back(3);
+//	v1.push_back(4);
+//	cout << v1[2] << endl;
+//	cout << v1.at(50) << endl;
+//
+//
+//	return 0;
+//}
 
-	//string s2 = "change world";
-
-	//string::iterator it = s1.begin();
-
-	//swap(s1, s2);
-
-	//while (it != s1.end())
-
-	//	cout << *it;
-
-	//cout << endl;
-
-	vector<int> v1;
-	vector<int>::iterator it = v1.begin();
-	auto end = v1.end();
-	//cin >> it;
-	cout << (it == end) << endl;
-	/*it += 2;*/
-	v1.push_back(1);
-	v1.push_back(2);
-	v1.push_back(3);
-	v1.push_back(4);
-	cout << v1[2] << endl;
-	cout << v1.at(50) << endl;
 
 
-	return 0;
-}
