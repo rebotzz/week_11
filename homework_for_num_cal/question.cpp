@@ -107,3 +107,9 @@ void question3_1()
 	rg2.print();
 	cout << endl;
 }
+
+
+void question4_1()
+{
+
+}
