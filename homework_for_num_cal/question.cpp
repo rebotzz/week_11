@@ -111,5 +111,27 @@ void question3_1()
 
 void question4_1()
 {
+	//函数定义 仿函数
+	struct f1
+	{
+		typedef long double Type;
 
+		Type operator()(Type x, Type y)
+		{
+			return (_g / _m) * (_m - _ro * _v - _k * y) / y;
+		}
+	private:
+		Type _m = 239.46;
+		Type _v = 0.2058;
+		Type _ro = 1035.71;
+		Type _k = 0.6;
+		Type _g = 9.8;
+	};
+
+	Rouge_Kuta<f1, long double> r1(0.0, 0.001, 90.0, 90.0 / 1000000);
+	double ret = r1.result();
+	//r1.printTable();
+	cout << endl;
+	cout << "result:" << endl;
+	cout << ret << endl;
 }

@@ -162,6 +162,7 @@ int main()
 	cout << "------------" << endl;
 	//question2_1();
 	//question3_1();
+	question4_1();
 
 	//func2();
 
