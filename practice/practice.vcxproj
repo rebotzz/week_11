@@ -128,7 +128,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AI_code.cpp" />
-    <ClCompile Include="homework.cpp" />
+    <ClCompile Include="polymorshism.cpp" />
+    <ClCompile Include="Rouge_Kuta.cpp" />
     <ClCompile Include="inherit.cpp" />
     <ClCompile Include="test.cc" />
   </ItemGroup>

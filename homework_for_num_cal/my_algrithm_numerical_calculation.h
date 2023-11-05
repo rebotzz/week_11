@@ -40,10 +40,10 @@ namespace NumericalCalculation
 		T _Lagrange(T x, const Container& xi, Container& yi)
 		{
 			size_t n = xi.size();
-			double y = 0.0;
+			T y = 0.0;
 			for (size_t i = 0; i < n; ++i)
 			{
-				double ln = 1.0;
+				T ln = 1.0;
 				for (size_t j = 0; j < n; ++j)
 				{
 					if (j != i)
@@ -75,7 +75,7 @@ namespace NumericalCalculation
 			//求插值点在插值多项式的值
 			//插值多项式
 			size_t n = _xi.size() - 1;
-			double p = fi[n];
+			T p = fi[n];
 			for (size_t i = n; i > 0; --i)
 			{
 				p *= (x - xi[i - 1]);
@@ -242,7 +242,7 @@ namespace NumericalCalculation
 			}
 
 
-			//3.求加速值Tk_m(h),即：Sk,Ck,Rk。。。
+			//3.求加速值Tk_m(h)，即：Sk,Ck,Rk。。。 理查德森外推法
 			for (int mi = 1; mi <= K; mi++)			//列
 			{
 				for (int ki = mi; ki <= K; ki++)	//行
@@ -333,7 +333,7 @@ namespace NumericalCalculation
 		int K = 4;				//初始二分次数
 		size_t _maxSize;
 		//Type _table[30][30];	//1.0数据存储在栈上
-		Type** _table;			//2.0数据存储在堆上
+		Type** _table;			//2.0数据存储在堆上  3.0使用vector,待续。。。
 	};
 
 
@@ -422,14 +422,3 @@ namespace NumericalCalculation
 
 }
 
-
-#define DEBUG
-#ifdef DEBUG
-
-namespace NumericalCalculation
-{
-
-
-}
-
-#endif // DEBUG

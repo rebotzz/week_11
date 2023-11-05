@@ -24,7 +24,10 @@
     <ClCompile Include="inherit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="homework.cpp">
+    <ClCompile Include="Rouge_Kuta.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="polymorshism.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
