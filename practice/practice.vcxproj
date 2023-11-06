@@ -131,6 +131,7 @@
     <ClCompile Include="polymorshism.cpp" />
     <ClCompile Include="Rouge_Kuta.cpp" />
     <ClCompile Include="inherit.cpp" />
+    <ClCompile Include="template.cpp" />
     <ClCompile Include="test.cc" />
   </ItemGroup>
   <ItemGroup>

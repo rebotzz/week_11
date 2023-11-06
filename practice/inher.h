@@ -27,3 +27,21 @@ public:
 protected:
 	int _b;
 };
+
+
+template<class T>
+T _add(T x, T y)
+{
+	cout << "函数模板分离编译" << endl;
+	cout << x + y << endl;
+	return x + y;
+}
+
+//函数模板分离编译,需要全特化
+template<>
+int _add<int>(int x, int y)
+{
+	cout << "函数模板分离编译" << endl;
+	cout << x + y << endl;
+	return x + y;
+}
