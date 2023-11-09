@@ -1,3 +1,7 @@
+#忽略.vs文件夹
+myapp_window/
+/myapp_window
+
 # Prerequisites
 *.d
 

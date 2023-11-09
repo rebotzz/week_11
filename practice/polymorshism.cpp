@@ -267,47 +267,61 @@ public:
 
 //抽象类 = 0   override 和 final
 
-class ablity
+//class ablity
+//{
+//public:
+//	virtual void ablity1() = 0		//纯虚函数,强制重写
+//	{
+//		cout << "virtual void ablity1() = 0" << endl;
+//	}
+//
+//	virtual void ablity2() 
+//	{
+//		cout << "virtual void ablity2() " << endl;
+//	}
+//
+//	virtual void recovery() final	//final,不让重写
+//	{
+//		cout << "recovery" << endl;
+//	}
+//};
+//
+//class actor : public ablity
+//{
+//public:
+//	virtual void ablity1() override		//override,检查是否重写
+//	{
+//		cout << "物理攻击+2" << endl;
+//	}
+//
+//	virtual void ablity2() override
+//	{
+//		cout << "防御+1 " << endl;
+//	}
+//
+//
+//};
+//
+//int main()
+//{
+//	actor jack;
+//	jack.ablity1();
+//	jack.ablity2();
+//	jack.recovery();
+//
+//	return 0;
+//}
+
+class TestA
 {
-public:
-	virtual void ablity1() = 0		//纯虚函数,强制重写
+	virtual TestA& operator=(TestA& a)
 	{
-		cout << "virtual void ablity1() = 0" << endl;
+		return *this;
 	}
-
-	virtual void ablity2() 
-	{
-		cout << "virtual void ablity2() " << endl;
-	}
-
-	virtual void recovery() final	//final,不让重写
-	{
-		cout << "recovery" << endl;
-	}
-};
-
-class actor : public ablity
-{
-public:
-	virtual void ablity1() override		//override,检查是否重写
-	{
-		cout << "物理攻击+2" << endl;
-	}
-
-	virtual void ablity2() override
-	{
-		cout << "防御+1 " << endl;
-	}
-
-
 };
 
 int main()
 {
-	actor jack;
-	jack.ablity1();
-	jack.ablity2();
-	jack.recovery();
 
 	return 0;
 }
