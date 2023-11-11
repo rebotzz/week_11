@@ -172,11 +172,11 @@ void testVector()
 		cout << endl;
 	}
 }
-
-int main()
-{
-	testBSTree3();
-	//testVector();
-
-	return 0;
-}
+//
+//int main()
+//{
+//	testBSTree3();
+//	//testVector();
+//
+//	return 0;
+//}

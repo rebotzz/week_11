@@ -331,7 +331,7 @@ namespace Key
 			_InOrder(root->_right);
 		}
 
-		//层序遍历
+		//层序遍历	这里层序无意义,只为了练习
 		void LevelOrder()
 		{
 			if (_root == nullptr)
@@ -581,6 +581,7 @@ namespace Key_Value
 			return false;
 		}
 
+		//中序遍历	遍历结果正好是升序
 		void InOrder()
 		{
 			//需要this指针才能找到成员,但是this指针也做为函数参数
@@ -589,7 +590,6 @@ namespace Key_Value
 			cout << endl;
 		}
 
-		//中序遍历
 		void _InOrder(Node* root)
 		{
 			if (root == nullptr)
