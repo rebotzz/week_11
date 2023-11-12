@@ -172,11 +172,118 @@ void testVector()
 		cout << endl;
 	}
 }
-//
-//int main()
-//{
-//	testBSTree3();
-//	//testVector();
-//
-//	return 0;
-//}
+
+
+
+
+
+/*
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+			val(x), left(NULL), right(NULL) {
+	}
+};*/
+class Solution {
+public:
+	TreeNode* Convert(TreeNode* root) {
+		if (root == nullptr)
+			return nullptr;
+
+		//将中序结果存储再数组
+		vector<TreeNode*> v;
+		_Convert(root, v);
+
+		print(v);
+		cout << v.size() << endl;
+
+		for (auto e : v)
+		{
+			cout << e->_key << " ";
+		}
+		cout << endl;
+
+
+		//调整数组前后元素指针
+		TreeNode* prev = nullptr;
+		TreeNode* cur = v[0];
+		TreeNode* next = nullptr;
+		cout << "-----" << endl;
+		//运算符重载    debug
+		//std::vector<TreeNode*>::iterator it = v.begin();
+		// auto it = v.begin();
+		// cout<<v[0]->_key;
+		// cout<<(it->_key)<<endl;   
+
+		 for(int i = 0; i < v.size(); i++)
+		 {
+		     //cout<<"i:"<<i<<" ";
+		     cout<<v[i]->_key<<" ";
+
+		     //初始处理
+		     if(i != 0)
+		         prev = cur;
+		     //
+		     cur = v[i];
+		     //末尾处理
+		     if(i + 1 < v.size())
+		         next = v[i + 1];
+		     else
+		         next = nullptr;
+
+		     //链接
+		     cur->_left = prev;
+		     cur->_right = next;
+		 }
+
+		return v[0];
+	}
+
+	void _Convert(TreeNode* root, vector<TreeNode*>& v)
+	{
+		if (root == nullptr)
+			return;
+
+		_Convert(root->_left, v);
+		v.push_back(root);
+		_Convert(root->_right, v);
+	}
+
+	void print(vector<TreeNode*> v)
+	{
+		for (auto e : v)
+		{
+			cout << e->_key << " ";
+		}
+		cout << endl;
+	}
+
+};
+
+
+void testBSTree4()
+{
+	//int a[] = { 8, 3, 1 };
+	int a[] = { 10,6,14,4,8,12,16 };
+	Key::BSTree<int> b;
+
+	for (auto e : a)
+	{
+		b.Insert(e);
+	}
+	b.InOrder();
+
+	Solution().Convert(b.GetRoot());
+
+}
+
+int main()
+{
+	testBSTree4();
+	//testVector();
+
+
+	return 0;
+}
