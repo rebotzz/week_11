@@ -121,39 +121,11 @@ vector<vector<int>> levelOrder(TreeNode* root)
 
 
 
-void testBSTree3()
-{
-	//int a[] = { 8, 3, 1 };
-	int a[] = { 8, 3, 1, 10, 6, 4, 7, 14, 13 };
-	Key::BSTree<int> b;
-
-	for (auto e : a)
-	{
-		b.InsertR(e);
-	}
-	b.InOrder();
-
-	b.LevelOrder();
-	cout << "deep:" << treeDeep(b.GetRoot()) << endl;
-
-	vector<vector<int>> v = levelOrder(b.GetRoot());
-
-	for (int i = 0; i < v.size(); ++i)
-	{
-		for (int j = 0; j < v[i].size(); ++j)
-		{
-			cout << v[i][j] << " ";
-		}
-		cout << endl;
-	}
-
-}
-
 void testVector()
 {
 	vector<vector<int>> v;
 	//v.reserve(3);					//扩容,但是没有数据,所以size不变
-	//v.resize(3, vector<int>());	//靠,尽然要这样
+	//v.resize(3, vector<int>());	//靠,竟然要这样
 	v.resize(3);					//等价
 	for (int i = 0; i < v.size(); ++i)
 	{
@@ -217,26 +189,26 @@ public:
 		// cout<<v[0]->_key;
 		// cout<<(it->_key)<<endl;   
 
-		 for(int i = 0; i < v.size(); i++)
-		 {
-		     //cout<<"i:"<<i<<" ";
-		     cout<<v[i]->_key<<" ";
+		for (int i = 0; i < v.size(); i++)
+		{
+			//cout<<"i:"<<i<<" ";
+			cout << v[i]->_key << " ";
 
-		     //初始处理
-		     if(i != 0)
-		         prev = cur;
-		     //
-		     cur = v[i];
-		     //末尾处理
-		     if(i + 1 < v.size())
-		         next = v[i + 1];
-		     else
-		         next = nullptr;
+			//初始处理
+			if (i != 0)
+				prev = cur;
+			//
+			cur = v[i];
+			//末尾处理
+			if (i + 1 < v.size())
+				next = v[i + 1];
+			else
+				next = nullptr;
 
-		     //链接
-		     cur->_left = prev;
-		     cur->_right = next;
-		 }
+			//链接
+			cur->_left = prev;
+			cur->_right = next;
+		}
 
 		return v[0];
 	}
@@ -263,27 +235,92 @@ public:
 };
 
 
-void testBSTree4()
+void testBStree5()
 {
-	//int a[] = { 8, 3, 1 };
-	int a[] = { 10,6,14,4,8,12,16 };
-	Key::BSTree<int> b;
+	Key_Value::BSTree<string, int> cTree;
+	//统计水果出现次数
+	string arr[] = { "苹果", "西瓜", "苹果", "西瓜", "苹果", "苹果", "西瓜",
+   "苹果", "香蕉", "苹果", "香蕉" };
 
-	for (auto e : a)
+	for (auto str : arr)
 	{
-		b.Insert(e);
+		//这里没有写迭代器,所以先用原生指针
+		Key_Value::BSTree<string, int>::Node* ret = cTree.Find(str);
+		//auto ret = cTree.Find(str);
+		if (ret == nullptr)
+		{
+			cTree.Insert(str, 1);
+		}
+		else
+		{
+			ret->_value++;
+		}
 	}
-	b.InOrder();
+	cTree.InOrder();
+	Key_Value::BSTree<string, int> cp(cTree);
+	cout << "copy:" << endl;
+	cp.InOrder();
 
-	Solution().Convert(b.GetRoot());
+
+	// 字典
+	Key_Value::BSTree<string, string> dict;
+	dict.Insert("string", "字符串");
+	dict.Insert("tree", "树");
+	dict.Insert("left", "左边、剩余");
+	dict.Insert("right", "右边");
+	dict.Insert("sort", "排序");
+	dict.Insert("tensor", "张量");
+	dict.Insert("alpha", "阿尔法");
+
+	dict.InOrder();
+
+	string input;
+	//退出: ctrl+c(发送kill信号)  or ctrl+z(键入EOF,文件结束符号)
+	while (cin >> input)
+	{
+		auto ret = dict.Find(input);
+		if(ret)
+			cout << ret->_value << endl;
+		else
+		{
+			cout << "not find." << endl;
+		}
+	}
 
 }
 
+void testBStree6()
+{
+	Key::BSTree<int> b;
+	int a[] = { 8, 3, 1, 10, 6, 4, 7, 14, 13 };
+
+	for (auto arr : a)
+	{
+		b.InsertR(arr);
+	}
+	b.InOrder();
+
+	Key::BSTree<int> copy(b);
+	copy.InOrder();
+
+	Key::BSTree<int> b2;
+	int arr2[] = { 6, 4, 7, 14, 13 };
+	for (auto arr : arr2)
+	{
+		b2.InsertR(arr);
+	}
+	b2.InOrder();
+
+	b2 = b;
+	b2.InOrder();
+}
+
+
 int main()
 {
-	testBSTree4();
+	//testBSTree4();
 	//testVector();
-
+	testBStree5();
 
 	return 0;
 }

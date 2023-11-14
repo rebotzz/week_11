@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-#include <queue>
 using namespace std;
 
 //二叉搜索树	数据结构
@@ -25,11 +24,26 @@ namespace Key
 	{
 		typedef BSTreeNode<K> Node;
 	public:
+		// 默认构造, 显示写了构造(拷贝构造),编译器就不生成默认构造,可以用default强制生成
+		BSTree() = default; 
 
-		//临时提供root
-		Node* GetRoot()
+		BSTree(const BSTree<K>& b)
 		{
-			return _root;
+			CopyTree(_root, b._root);
+		}
+
+		~BSTree()
+		{
+			//cout << "~BSTree()" << endl;
+			DestoryTree(_root);
+		}
+
+		BSTree<K>& operator=(BSTree<K> b)
+		{
+			//拷贝后的b,不用判断if(&b != this);本就不同
+			//this->_root换到临时对象b,调用结束,被析构了
+			std::swap(_root, b._root);
+			return *this;
 		}
 
 		bool Insert(const K& key)
@@ -103,33 +117,126 @@ namespace Key
 			return false;
 		}
 
+		bool Erase(const K& key)
+		{
+			if (_root == nullptr)
+			{
+				cout << "empty!" << endl;
+				return false;
+			}
+
+			Node* cur = _root;
+			Node* parent = _root;
+			while (cur)
+			{
+				//找到key
+				if (cur->_key > key)
+				{
+					parent = cur;
+					cur = cur->_left;
+				}
+				else if (cur->_key < key)
+				{
+					parent = cur;
+					cur = cur->_right;
+				}
+				else
+				{
+					// 找到了_key,开始删除
+					// 1.cur左右子树其中一个为空,父节点继承单个就行
+					// 2.cur左右子树都不为空,找一个可以替代父节点的替代节点赋值父节点,然后删除替代节点
+					// 替代节点: 左子树的最大值 or 右子树的最小值 -- 问题转化为1.
+
+					// debug: 需要排除cur是root情况,解决:更换root节点
+					// 1.cur左右子树其中一个为空,父节点继承单个就行
+					if (cur->_left == nullptr)
+					{
+						if (cur == _root)
+						{
+							_root = cur->_right;
+						}
+						else
+						{
+							if (parent->_key > cur->_key)
+							{
+								parent->_left = cur->_right;
+							}
+							else
+							{
+								parent->_right = cur->_right;
+							}
+						}
+
+						delete cur;
+					}
+					else if (cur->_right == nullptr)
+					{
+						if (cur == _root)
+						{
+							_root = cur->_left;
+						}
+						else
+						{
+							if (parent->_key > cur->_key)
+							{
+								parent->_left = cur->_left;
+							}
+							else
+							{
+								parent->_right = cur->_left;
+							}
+						}
+
+						delete cur;
+					}
+					else
+					{
+						// 2.cur左右子树都不为空,找一个可以替代父节点的替代节点赋值父节点,然后删除替代节点
+						Node* pmaxLeft = cur;
+						Node* maxLeft = cur->_left;
+						while (maxLeft->_right)
+						{
+							pmaxLeft = maxLeft;
+							maxLeft = maxLeft->_right;
+						}
+						cur->_key = maxLeft->_key;
+
+						//maxLeft可能有左子树
+						// 2.0
+						if (pmaxLeft->_left == maxLeft)	//cur == pmaxLeft
+						{
+							pmaxLeft->_left = maxLeft->_left;
+						}
+						else
+						{
+							pmaxLeft->_right = maxLeft->_left;
+						}
+						delete maxLeft;
+					}
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		void InOrder()
+		{
+			//需要this指针才能找到成员,但是this指针也做为函数参数
+			//因为this指针原因,成员不能作为缺省参数 -> 子函数解决递归传参
+			_InOrder(_root);
+			cout << endl;
+		}
+
 		//递归版本
 		bool InsertR(const K& key)
 		{
 			return _InsertR(_root, key);
 		}
 
-		bool _InsertR(Node*& root, const K& key)
+		bool EraseR(const K& key)
 		{
-			if (root == nullptr)
-			{
-				//root为父节点_left 或 _right的引用,可直接赋值
-				root = new Node(key);
-				return true;
-			}
-
-			if (root->_key > key)
-			{
-				return _InsertR(root->_left, key);
-			}
-			else if (root->_key < key)
-			{
-				return _InsertR(root->_right, key);
-			}
-			else
-			{
-				return false;
-			}
+			return _EraseR(_root, key);
 		}
 
 		bool FindR(const K& key)
@@ -137,29 +244,27 @@ namespace Key
 			return _FindR(_root, key);
 		}
 
-		bool _FindR(Node* root, const K& key)
+	protected:
+		// 注意引用传参
+		void CopyTree(Node*& copy, Node* cur)
 		{
-			if (root == nullptr)
-				return false;
+			if (cur == nullptr)
+				return;
 
-			if (root->_key > key)
-			{
-				return _FindR(root->_left, key);
-			}
-			else if (root->_key < key)
-			{
-				return _FindR(root->_right, key);
-			}
-			else
-			{
-				return true;
-			}
+			copy = new Node(cur->_key);
+			CopyTree(copy->_left, cur->_left);
+			CopyTree(copy->_right, cur->_right);
 		}
 
-
-		bool EraseR(const K& key)
+		void DestoryTree(Node* cur)
 		{
-			return _EraseR(_root, key);
+			if (cur == nullptr)
+				return;
+			//后序遍历
+			DestoryTree(cur->_left);
+			DestoryTree(cur->_right);
+			//cout << cur->_key << endl;
+			delete cur;
 		}
 
 		bool _EraseR(Node*& root, const K& key)
@@ -206,116 +311,46 @@ namespace Key
 			}
 		}
 
-		bool Erase(const K& key)
+		bool _InsertR(Node*& root, const K& key)
 		{
-			if (_root == nullptr)
+			if (root == nullptr)
 			{
-				cout << "empty!" << endl;
+				//root为父节点_left 或 _right的引用,可直接赋值
+				root = new Node(key);
+				return true;
+			}
+
+			if (root->_key > key)
+			{
+				return _InsertR(root->_left, key);
+			}
+			else if (root->_key < key)
+			{
+				return _InsertR(root->_right, key);
+			}
+			else
+			{
 				return false;
 			}
-
-			Node* cur = _root;
-			Node* parent = _root;
-			while (cur)
-			{
-				//找到key
-				if (cur->_key > key)
-				{
-					parent = cur;
-					cur = cur->_left;
-				}
-				else if (cur->_key < key)
-				{
-					parent = cur;
-					cur = cur->_right;
-				}
-				else
-				{
-					//debug: 需要排除cur是root情况
-					//cur左右子树其中一个为空,父节点继承单个就行
-					if (cur->_left == nullptr)
-					{
-						if (cur == _root)
-						{
-							_root = cur->_right;
-						}
-						else
-						{
-							if (parent->_key > cur->_key)
-							{
-								parent->_left = cur->_right;
-							}
-							else
-							{
-								parent->_right = cur->_right;
-							}
-						}
-
-						delete cur;
-					}
-					else if (cur->_right == nullptr)
-					{
-						if (cur == _root)
-						{
-							_root = cur->_left;
-						}
-						else
-						{
-							if (parent->_key > cur->_key)
-							{
-								parent->_left = cur->_left;
-							}
-							else
-							{
-								parent->_right = cur->_left;
-							}
-						}
-
-						delete cur;
-					}
-					else
-					{
-						//cur两个子树都不为空,选介于左右子树大小之间的值作为cur子树根节点
-						// 左子树 < 左子树最大值 or 右子树最小值 < 右子树
-						Node* pmaxLeft = cur;
-						Node* maxLeft = cur->_left;
-						while (maxLeft->_right)
-						{
-							pmaxLeft = maxLeft;
-							maxLeft = maxLeft->_right;
-						}
-						cur->_key = maxLeft->_key;
-
-						//maxLeft可能有左子树
-						// 1.0
-						//if (cur == pmaxLeft)
-						//{
-						//	pmaxLeft->_left = maxLeft->_left;
-						//}
-						// 2.0
-						if (pmaxLeft->_left == maxLeft)
-						{
-							pmaxLeft->_left = maxLeft->_left;
-						}
-						else
-						{
-							pmaxLeft->_right = maxLeft->_left;
-						}
-						delete maxLeft;
-					}
-					return true;
-				}
-			}
-
-			return false;
 		}
 
-		void InOrder()
+		bool _FindR(Node* root, const K& key)
 		{
-			//需要this指针才能找到成员,但是this指针也做为函数参数
-			//因为this指针原因,成员遍历不能作为缺省参数 -> 子函数解决递归传参
-			_InOrder(_root);
-			cout << endl;
+			if (root == nullptr)
+				return false;
+
+			if (root->_key > key)
+			{
+				return _FindR(root->_left, key);
+			}
+			else if (root->_key < key)
+			{
+				return _FindR(root->_right, key);
+			}
+			else
+			{
+				return true;
+			}
 		}
 
 		//中序遍历
@@ -331,51 +366,6 @@ namespace Key
 			_InOrder(root->_right);
 		}
 
-		//层序遍历	这里层序无意义,只为了练习
-		void LevelOrder()
-		{
-			if (_root == nullptr)
-				return;
-
-			queue<Node*> qNode;
-			qNode.push(_root);	
-			while (!qNode.empty())
-			{
-				cout << qNode.front()->_key << " ";
-				if (qNode.front()->_left)
-				{
-					qNode.push(qNode.front()->_left);
-
-				}
-				if (qNode.front()->_right)
-				{
-					qNode.push(qNode.front()->_right);
-				}
-				qNode.pop();
-			}
-
-			cout << endl;
-		}
-
-		//递归写法
-		//if (root == nullptr)
-		//{
-		//	return;
-		//}
-
-		//while (qNode.front() == nullptr)
-		//{
-		//	qNode.pop();
-		//}
-		//
-		//qNode.push(qNode.front()->_left);
-		//qNode.push(qNode.front()->_right);
-		//qNode.pop();
-
-		////递归
-		//_LevelOrder(root->_left,qNode, level + 1);
-		//_LevelOrder(root->_right,qNode, level + 1);
-
 	private:
 		Node* _root = nullptr;
 	};
@@ -383,7 +373,7 @@ namespace Key
 
 namespace Key_Value
 {
-	//二叉搜索树	数据结构
+	//搜索二叉树	数据结构
 	template<class K, class V>
 	struct BSTreeNode
 	{
@@ -403,8 +393,30 @@ namespace Key_Value
 	template<class K, class V>
 	class BSTree
 	{
-		typedef BSTreeNode<K, V> Node;
 	public:
+		typedef BSTreeNode<K, V> Node;
+
+		// 默认构造, 显示写了构造(拷贝构造),编译器就不生成默认构造,可以用default强制生成
+		BSTree() = default;
+
+		BSTree(const BSTree<K, V>& b)
+		{
+			CopyTree(_root, b._root);
+		}
+
+		~BSTree()
+		{
+			DestoryTree(_root);
+		}
+
+		BSTree<K, V>& operator=(BSTree<K, V> b)
+		{
+			//拷贝后的b,不用判断if(&b != this);本就不同
+			//this->_root换到临时对象b,调用结束,被析构了
+			std::swap(_root, b._root);
+			return *this;
+		}
+
 		bool Insert(const K& key, const V& value)
 		{
 			if (_root == nullptr)
@@ -449,11 +461,11 @@ namespace Key_Value
 			}
 		}
 
-		bool Find(const K& key)
+		Node* Find(const K& key)
 		{
 			if (_root == nullptr)
 			{
-				return false;
+				return nullptr;
 			}
 
 			Node* cur = _root;
@@ -469,11 +481,11 @@ namespace Key_Value
 				}
 				else
 				{
-					return true;
+					return cur;
 				}
 			}
 
-			return false;
+			return nullptr;
 		}
 
 
@@ -501,9 +513,9 @@ namespace Key_Value
 					cur = cur->_right;
 				}
 				else
-				{
-					//debug: 需要排除cur是root情况
-					//cur左右子树其中一个为空,父节点继承单个就行
+				{	
+					// 1.cur左右子树其中一个为空
+					// debug: 需要排除cur是root情况,更换root节点
 					if (cur->_left == nullptr)
 					{
 						if (cur == _root)
@@ -546,7 +558,8 @@ namespace Key_Value
 					}
 					else
 					{
-						//cur两个子树都不为空,选介于左右子树大小之间的值作为cur子树根节点
+						// 2.cur左右子树都不为空,选介于左右子树大小之间的值作为cur子树根节点
+						// 左子树 < 父节点 < 右子树
 						// 左子树 < 左子树最大值 or 右子树最小值 < 右子树
 						Node* pmaxLeft = cur;
 						Node* maxLeft = cur->_left;
@@ -558,13 +571,8 @@ namespace Key_Value
 						cur->_key = maxLeft->_key;
 
 						//maxLeft可能有左子树
-						// 1.0
-						//if (cur == pmaxLeft)
-						//{
-						//	pmaxLeft->_left = maxLeft->_left;
-						//}
 						// 2.0
-						if (pmaxLeft->_left == maxLeft)
+						if (pmaxLeft->_left == maxLeft)	//当pmaxLeft == cur
 						{
 							pmaxLeft->_left = maxLeft->_left;
 						}
@@ -598,8 +606,30 @@ namespace Key_Value
 			}
 
 			_InOrder(root->_left);
-			cout << root->_key << " ";
+			cout << root->_key << ": " << root->_value << endl;
 			_InOrder(root->_right);
+		}
+
+	protected:
+		// 注意引用传参
+		void CopyTree(Node*& copy, Node* cur)
+		{
+			if (cur == nullptr)
+				return;
+
+			copy = new Node(cur->_key, cur->_value);
+			CopyTree(copy->_left, cur->_left);
+			CopyTree(copy->_right, cur->_right);
+		}
+
+		void DestoryTree(Node* cur)
+		{
+			if (cur == nullptr)
+				return;
+			//后序遍历
+			DestoryTree(cur->_left);
+			DestoryTree(cur->_right);
+			delete cur;
 		}
 
 	private:

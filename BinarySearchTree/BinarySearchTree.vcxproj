@@ -130,6 +130,7 @@
     <ClCompile Include="BinarySearchTree.cpp" />
     <ClCompile Include="OJ_practice.cpp" />
     <ClCompile Include="test.cpp" />
+    <ClCompile Include="tmp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinarySearchTree.h" />
